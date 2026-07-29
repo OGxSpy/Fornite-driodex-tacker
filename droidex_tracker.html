@@ -552,10 +552,14 @@ function toggleRarity(rarity){
 function refreshCard(name){
   const card=document.querySelector(`[data-droid="${CSS.escape(name)}"]`);
   if(!card) return;
-  const n=VARIANTS.filter(v=>col[name+"_"+v]).length;
   const d=DROIDS.find(x=>x.name===name);
+  if(!d) return;
+  
+  const availableVariants = d.rarity==="Iconic" ? ["Base"] : VARIANTS;
+  const n=availableVariants.filter(v=>col[name+"_"+v]).length;
+  
   // update each vbtn
-  VARIANTS.forEach(v=>{
+  availableVariants.forEach(v=>{
     const btn=card.querySelector(`[data-v="${v}"]`);
     if(!btn) return;
     const on=!!col[name+"_"+v];
@@ -563,31 +567,35 @@ function refreshCard(name){
     btn.querySelector(".v-dot").textContent=on?"✓":"";
   });
   // update image
-  if(d){
-    const img=card.querySelector(".droid-card-img");
-    if(img){
-      const {url,collected}=getDroidImgUrl(d);
-      img.src=url;
-      img.className="droid-card-img "+(collected?"":"uncollected");
-    }
+  const img=card.querySelector(".droid-card-img");
+  if(img){
+    const {url,collected}=getDroidImgUrl(d);
+    img.src=url;
+    img.className="droid-card-img "+(collected?"":"uncollected");
   }
   // badge
   const badge=card.querySelector(".complete-badge");
   if(badge){
-    if(n===VARIANTS.length){badge.textContent="✨ Complete!";badge.className="complete-badge done";}
-    else if(n>0){badge.textContent=n+"/"+VARIANTS.length;badge.className="complete-badge partial";}
+    if(n===availableVariants.length){badge.textContent="✨ Complete!";badge.className="complete-badge done";}
+    else if(n>0){badge.textContent=n+"/"+availableVariants.length;badge.className="complete-badge partial";}
     else{badge.textContent="";badge.className="complete-badge";}
   }
-  card.classList.toggle("all-done", n===VARIANTS.length);
+  card.classList.toggle("all-done", n===availableVariants.length);
 }
 
 // ────────────────────────────────────────────────────────
 //  STATS
 // ────────────────────────────────────────────────────────
 function updateStats(){
-  const total = DROIDS.length * VARIANTS.length;
+  // Calculate total accounting for Iconic droids only having 1 variant
+  const total = DROIDS.reduce((sum,d)=>{
+    return sum + (d.rarity==="Iconic" ? 1 : VARIANTS.length);
+  },0);
   const cnt   = Object.keys(col).length;
-  const dCnt  = DROIDS.filter(d=>VARIANTS.some(v=>col[d.name+"_"+v])).length;
+  const dCnt  = DROIDS.filter(d=>{
+    const av = d.rarity==="Iconic" ? ["Base"] : VARIANTS;
+    return av.some(v=>col[d.name+"_"+v]);
+  }).length;
   const pct   = total>0 ? Math.round(cnt/total*100) : 0;
   document.getElementById("sCollected").textContent=cnt;
   document.getElementById("sTotal").textContent=total;
@@ -598,12 +606,17 @@ function updateStats(){
   // per-rarity bars
   R_ORDER.forEach(r=>{
     const ds=DROIDS.filter(d=>d.rarity===r);
-    const rt=ds.length*VARIANTS.length;
-    const rc=ds.reduce((a,d)=>a+VARIANTS.filter(v=>col[d.name+"_"+v]).length,0);
+    const rt=ds.reduce((sum,d)=>{
+      return sum + (d.rarity==="Iconic" ? 1 : VARIANTS.length);
+    },0);
+    const rc=ds.reduce((a,d)=>{
+      const av = d.rarity==="Iconic" ? ["Base"] : VARIANTS;
+      return a + av.filter(v=>col[d.name+"_"+v]).length;
+    },0);
     const el=document.getElementById("rprog-"+r);
     if(el){ el.textContent=rc+"/"+rt; }
     const fill=document.getElementById("rfill-"+r);
-    if(fill){ fill.style.width=(rc/rt*100)+"%"; }
+    if(fill){ fill.style.width=rt>0?(rc/rt*100)+"%":"0%"; }
   });
 }
 
@@ -631,14 +644,16 @@ function filtered(){
 }
 
 function cardHTML(d){
-  const n=VARIANTS.filter(v=>col[d.name+"_"+v]).length;
-  const done=n===VARIANTS.length;
+  // Iconic droids only have Base variant
+  const availableVariants = d.rarity==="Iconic" ? ["Base"] : VARIANTS;
+  const n=availableVariants.filter(v=>col[d.name+"_"+v]).length;
+  const done=n===availableVariants.length;
   const typeClass="t-"+d.type;
   let badge="";
   if(done) badge=`<span class="complete-badge done">✨ Complete!</span>`;
-  else if(n>0) badge=`<span class="complete-badge partial">${n}/${VARIANTS.length}</span>`;
+  else if(n>0) badge=`<span class="complete-badge partial">${n}/${availableVariants.length}</span>`;
 
-  const varBtns=VARIANTS.map(v=>{
+  const varBtns=availableVariants.map(v=>{
     const on=!!col[d.name+"_"+v];
     const iconClass=v==="Rainbow"?"vi-Rainbow":v==="Galactic"?"vi-Galactic":"";
     const safeName=d.name.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
@@ -688,9 +703,14 @@ function render(){
     const ds=DROIDS.filter(d=>d.rarity===r);
     const vis=list.filter(d=>d.rarity===r);
     if(!vis.length) return;
-    const rt=ds.length*VARIANTS.length;
-    const rc=ds.reduce((a,d)=>a+VARIANTS.filter(v=>col[d.name+"_"+v]).length,0);
-    const pct=Math.round(rc/rt*100);
+    const rt=ds.reduce((sum,d)=>{
+      return sum + (d.rarity==="Iconic" ? 1 : VARIANTS.length);
+    },0);
+    const rc=ds.reduce((a,d)=>{
+      const av = d.rarity==="Iconic" ? ["Base"] : VARIANTS;
+      return a + av.filter(v=>col[d.name+"_"+v]).length;
+    },0);
+    const pct=rt>0?Math.round(rc/rt*100):0;
     const col_=R_COLORS[r];
     const isCollapsed=collapsed[r];
     const arrowClass=isCollapsed?"rarity-arrow collapsed":"rarity-arrow";

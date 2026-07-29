@@ -423,11 +423,13 @@ const DROIDS = [
   {name:"KX",            rarity:"Mythic",    type:"Battle",    cost:"~450m", income:"TBC",      sell:"N/A",    ct:"N/A", perk:"+100 Max Health"},
   {name:"IG",            rarity:"Mythic",    type:"Battle",    cost:"~450m", income:"TBC",      sell:"N/A",    ct:"N/A", perk:"+100 Max Health"},
   // ─ ICONIC (Companion droids — no cost, give % income bonus) ─
-  {name:"DJ R-3X",       rarity:"Iconic",    type:"Worker",    cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
-  {name:"CB-23",         rarity:"Iconic",    type:"Astromech", cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
-  {name:"BB8",           rarity:"Iconic",    type:"Astromech", cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
+  {name:"BB-8",          rarity:"Iconic",    type:"Astromech", cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
   {name:"Mister Bones",  rarity:"Iconic",    type:"Battle",    cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
   {name:"IG-11 Marshal", rarity:"Iconic",    type:"Battle",    cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
+  {name:"CB-23",         rarity:"Iconic",    type:"Astromech", cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
+  {name:"DJ R-3X",       rarity:"Iconic",    type:"Worker",    cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
+  {name:"R2-D2",         rarity:"Iconic",    type:"Astromech", cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
+  {name:"C-3PO",         rarity:"Iconic",    type:"Worker",    cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
 ];
 
 const VARIANTS  = ["Base","Gold","Diamond","Rainbow","Beskar","Galactic"];
@@ -439,7 +441,7 @@ const R_COLORS  = {Common:"#9ca3af",Rare:"#3b82f6",Epic:"#a855f7",Legendary:"#f5
 const IMG_BASE = "https://raw.githubusercontent.com/erikpeik/droidex/main/public/droids/";
 const V_IMGKEY = {Base:"DEFAULT",Gold:"GOLD",Diamond:"DIAMOND",Rainbow:"RAINBOW",Beskar:"BESKAR",Galactic:"BESKAR"};
 // Special overrides where auto-name doesn't match file
-const IMG_OVERRIDES = {"Util-Tech":"UTIL-TEC","DJ R-3X":"DJ-R3X"};
+const IMG_OVERRIDES = {"Util-Tech":"UTIL-TEC","DJ R-3X":"DJ-R3X","BB-8":"BB8"};
 
 function getDroidImgKey(name){
   return IMG_OVERRIDES[name] || name.toUpperCase().replace(/ /g,"_");

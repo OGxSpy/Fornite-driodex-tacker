@@ -17,6 +17,7 @@
   --rare: #3b82f6;
   --epic: #a855f7;
   --legendary: #f59e0b;
+  --mythic: #ec4899;
   --iconic: #e84545;
   --worker: #4ade80;
   --astro: #38bdf8;
@@ -134,6 +135,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .rarity-Rare   .rarity-hdr{border-color:var(--rare);}    .rarity-Rare   .rarity-badge{background:rgba(59,130,246,.15);color:var(--rare);}
 .rarity-Epic   .rarity-hdr{border-color:var(--epic);}    .rarity-Epic   .rarity-badge{background:rgba(168,85,247,.15);color:var(--epic);}
 .rarity-Legendary .rarity-hdr{border-color:var(--legendary);} .rarity-Legendary .rarity-badge{background:rgba(245,158,11,.15);color:var(--legendary);}
+.rarity-Mythic .rarity-hdr{border-color:var(--mythic);}  .rarity-Mythic .rarity-badge{background:rgba(236,72,153,.15);color:var(--mythic);}
 .rarity-Iconic .rarity-hdr{border-color:var(--iconic);}  .rarity-Iconic .rarity-badge{background:rgba(232,69,69,.15);color:var(--iconic);}
 
 .rarity-prog{display:flex;align-items:center;gap:7px;font-size:0.74rem;}
@@ -220,6 +222,7 @@ body::before{content:'';position:fixed;inset:0;background:
 
 /* ── COMPANION NOTE ── */
 .companion-note{font-size:0.7rem;color:var(--muted);margin-top:6px;padding:4px 8px;background:rgba(232,69,69,.06);border-radius:5px;border-left:2px solid var(--iconic);}
+.perk-note{font-size:0.7rem;color:var(--muted);margin-top:6px;padding:4px 8px;background:rgba(236,72,153,.08);border-radius:5px;border-left:2px solid var(--mythic);}
 
 /* ── SCROLLBAR ── */
 ::-webkit-scrollbar{width:6px;height:6px;}
@@ -295,6 +298,7 @@ body::before{content:'';position:fixed;inset:0;background:
     <option value="Rare">Rare</option>
     <option value="Epic">Epic</option>
     <option value="Legendary">Legendary</option>
+    <option value="Mythic">Mythic</option>
     <option value="Iconic">Iconic</option>
   </select>
   <select id="fType" onchange="render()">
@@ -406,6 +410,18 @@ const DROIDS = [
   {name:"B2-RP",         rarity:"Legendary", type:"Battle",    cost:"31m",   income:"1.3k/s",   sell:"21.7m",  ct:"0:38:38"},
   {name:"Cyclo-Grav",    rarity:"Legendary", type:"Battle",    cost:"30m",   income:"1.26k/s",  sell:"21m",    ct:"0:37:21"},
   {name:"Opti-Strike",   rarity:"Legendary", type:"Battle",    cost:"37m",   income:"1.5k/s",   sell:"25.9m",  ct:"0:44:22"},
+  // ─ MYTHIC (Jawa Sandcrawler shop — 300m-500m credits · class equip perks) ─
+  {name:"Loadlifter",    rarity:"Mythic",    type:"Worker",    cost:"~300m", income:"7.2k/s",   sell:"N/A",    ct:"N/A", perk:"+30% Droid Crafting Speed"},
+  {name:"LEP",           rarity:"Mythic",    type:"Worker",    cost:"~300m", income:"TBC",      sell:"N/A",    ct:"N/A", perk:"+30% Droid Crafting Speed"},
+  {name:"RIC",           rarity:"Mythic",    type:"Worker",    cost:"~300m", income:"TBC",      sell:"N/A",    ct:"N/A", perk:"+30% Droid Crafting Speed"},
+  {name:"RIC-1200",      rarity:"Mythic",    type:"Worker",    cost:"~400m", income:"TBC",      sell:"N/A",    ct:"N/A", perk:"+30% Droid Crafting Speed"},
+  {name:"Snow Mouse",    rarity:"Mythic",    type:"Worker",    cost:"~300m", income:"TBC",      sell:"N/A",    ct:"N/A", perk:"+30% Droid Crafting Speed"},
+  {name:"Cyclens",       rarity:"Mythic",    type:"Astromech", cost:"~350m", income:"TBC",      sell:"N/A",    ct:"N/A", perk:"+5 Pickaxe Level"},
+  {name:"MO-TRAK",       rarity:"Mythic",    type:"Astromech", cost:"~350m", income:"TBC",      sell:"N/A",    ct:"N/A", perk:"+5 Pickaxe Level"},
+  {name:"DRFT-R",        rarity:"Mythic",    type:"Astromech", cost:"~350m", income:"TBC",      sell:"N/A",    ct:"N/A", perk:"+5 Pickaxe Level"},
+  {name:"TRI-TEK",       rarity:"Mythic",    type:"Astromech", cost:"~400m", income:"TBC",      sell:"N/A",    ct:"N/A", perk:"+5 Pickaxe Level"},
+  {name:"KX",            rarity:"Mythic",    type:"Battle",    cost:"~450m", income:"TBC",      sell:"N/A",    ct:"N/A", perk:"+100 Max Health"},
+  {name:"IG",            rarity:"Mythic",    type:"Battle",    cost:"~450m", income:"TBC",      sell:"N/A",    ct:"N/A", perk:"+100 Max Health"},
   // ─ ICONIC (Companion droids — no cost, give % income bonus) ─
   {name:"DJ R-3X",       rarity:"Iconic",    type:"Worker",    cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
   {name:"CB-23",         rarity:"Iconic",    type:"Astromech", cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
@@ -416,8 +432,8 @@ const DROIDS = [
 
 const VARIANTS  = ["Base","Gold","Diamond","Rainbow","Beskar","Galactic"];
 const V_ICONS   = {Base:"⬜",Gold:"🟡",Diamond:"💎",Rainbow:"🌈",Beskar:"🔩",Galactic:"🌌"};
-const R_ORDER   = ["Common","Rare","Epic","Legendary","Iconic"];
-const R_COLORS  = {Common:"#9ca3af",Rare:"#3b82f6",Epic:"#a855f7",Legendary:"#f59e0b",Iconic:"#e84545"};
+const R_ORDER   = ["Common","Rare","Epic","Legendary","Mythic","Iconic"];
+const R_COLORS  = {Common:"#9ca3af",Rare:"#3b82f6",Epic:"#a855f7",Legendary:"#f59e0b",Mythic:"#ec4899",Iconic:"#e84545"};
 
 // ── IMAGES ──
 const IMG_BASE = "https://raw.githubusercontent.com/erikpeik/droidex/main/public/droids/";
@@ -689,6 +705,7 @@ function cardHTML(d){
     </div>
     <div class="variants">${varBtns}</div>
     ${d.companion?`<div class="companion-note">🎵 Companion droid — gives +15% income bonus to its type when placed</div>`:""}
+    ${d.perk?`<div class="perk-note">⚡ Equip perk: ${d.perk}</div>`:""}
   </div>`;
 }
 

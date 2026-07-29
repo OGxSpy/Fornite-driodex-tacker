@@ -80,6 +80,20 @@ body::before{content:'';position:fixed;inset:0;background:
 .api-bar input:focus{outline:none;border-color:var(--yellow);}
 #keyStatus{font-size:0.76rem;}
 
+/* ── BULK SELECT ── */
+.bulk-section{display:flex;gap:8px;flex-wrap:wrap;align-items:center;padding:10px 20px;background:var(--surface2);border-bottom:1px solid var(--border);}
+.bulk-label{font-size:0.82rem;font-weight:700;color:var(--muted);margin-right:4px;}
+.btn-bulk{padding:6px 12px;border-radius:6px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:0.78rem;font-weight:700;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px;}
+.btn-bulk:hover{transform:translateY(-1px);background:var(--surface);}
+.btn-bulk:active{transform:translateY(0);}
+.btn-bulk-base:hover{border-color:#9ca3af;}
+.btn-bulk-gold:hover{border-color:var(--gold);}
+.btn-bulk-diamond:hover{border-color:var(--diamond);}
+.btn-bulk-rainbow:hover{border-color:var(--rainbow);}
+.btn-bulk-beskar:hover{border-color:var(--beskar);}
+.btn-bulk-galactic:hover{border-color:var(--galactic);box-shadow:0 0 8px rgba(167,139,250,.2);}
+.btn-bulk-clear:hover{border-color:#ef4444;color:#ef4444;}
+
 /* ── FILTER BAR ── */
 .filter-bar{display:flex;gap:8px;flex-wrap:wrap;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--border);}
 .filter-bar input,.filter-bar select{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:0.82rem;}
@@ -111,7 +125,10 @@ body::before{content:'';position:fixed;inset:0;background:
 
 /* ── RARITY SECTION ── */
 .rarity-block{margin-bottom:30px;}
-.rarity-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid;}
+.rarity-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid;cursor:pointer;user-select:none;transition:opacity .2s;}
+.rarity-hdr:hover{opacity:.85;}
+.rarity-arrow{font-size:1rem;transition:transform .25s;margin-right:-4px;}
+.rarity-arrow.collapsed{transform:rotate(-90deg);}
 .rarity-badge{padding:3px 11px;border-radius:999px;font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;}
 .rarity-Common .rarity-hdr{border-color:var(--common);}  .rarity-Common .rarity-badge{background:rgba(156,163,175,.15);color:var(--common);}
 .rarity-Rare   .rarity-hdr{border-color:var(--rare);}    .rarity-Rare   .rarity-badge{background:rgba(59,130,246,.15);color:var(--rare);}
@@ -125,7 +142,7 @@ body::before{content:'';position:fixed;inset:0;background:
 .rarity-count{margin-left:auto;font-size:0.76rem;color:var(--muted);}
 
 /* ── GRID ── */
-.droids-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:9px;}
+.droids-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:9px;transition:all .25s;}
 
 /* ── CARD ── */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px;transition:border-color .2s,background .2s;}
@@ -289,6 +306,18 @@ body::before{content:'';position:fixed;inset:0;background:
   </select>
 </div>
 
+<!-- ══ BULK SELECT ══ -->
+<div class="bulk-section">
+  <div class="bulk-label">⚡ Quick Select All:</div>
+  <button class="btn-bulk btn-bulk-base" onclick="selectAllVariant('Base')">⬜ Base</button>
+  <button class="btn-bulk btn-bulk-gold" onclick="selectAllVariant('Gold')">🟡 Gold</button>
+  <button class="btn-bulk btn-bulk-diamond" onclick="selectAllVariant('Diamond')">💎 Diamond</button>
+  <button class="btn-bulk btn-bulk-rainbow" onclick="selectAllVariant('Rainbow')">🌈 Rainbow</button>
+  <button class="btn-bulk btn-bulk-beskar" onclick="selectAllVariant('Beskar')">🔩 Beskar</button>
+  <button class="btn-bulk btn-bulk-galactic" onclick="selectAllVariant('Galactic')">🌌 Galactic</button>
+  <button class="btn-bulk btn-bulk-clear" onclick="clearAllVariant()">🗑️ Clear All</button>
+</div>
+
 <!-- ══ SCREENSHOT SCAN ══ -->
 <div class="scan-section">
   <div class="drop-zone" id="dropZone"
@@ -388,11 +417,16 @@ const R_COLORS  = {Common:"#9ca3af",Rare:"#3b82f6",Epic:"#a855f7",Legendary:"#f5
 //  STATE
 // ────────────────────────────────────────────────────────
 let col = {}; // {name_Variant: true}
+let collapsed = {}; // {rarity: true/false}
 
 function load(){
   try{ const r=localStorage.getItem("droidex_v2"); if(r) col=JSON.parse(r); }catch(e){}
+  try{ const c=localStorage.getItem("droidex_collapsed"); if(c) collapsed=JSON.parse(c); }catch(e){}
 }
-function save(){ localStorage.setItem("droidex_v2",JSON.stringify(col)); }
+function save(){ 
+  localStorage.setItem("droidex_v2",JSON.stringify(col)); 
+  localStorage.setItem("droidex_collapsed",JSON.stringify(collapsed));
+}
 
 // ────────────────────────────────────────────────────────
 //  API KEY
@@ -444,6 +478,27 @@ async function testKey(){
 }
 
 // ────────────────────────────────────────────────────────
+//  BULK SELECT
+// ────────────────────────────────────────────────────────
+function selectAllVariant(variant){
+  const list=filtered();
+  let added=0;
+  list.forEach(d=>{
+    const key=d.name+"_"+variant;
+    if(!col[key]){ col[key]=true; added++; }
+  });
+  save(); render(); updateStats();
+  toast(`✅ Marked ${added} droids as ${variant}!`,"success");
+}
+
+function clearAllVariant(){
+  if(!confirm("Clear all collected droids? This cannot be undone.")) return;
+  col={};
+  save(); render(); updateStats();
+  toast("🗑️ All droids cleared.","info");
+}
+
+// ────────────────────────────────────────────────────────
 //  TOGGLE
 // ────────────────────────────────────────────────────────
 function toggle(name, v){
@@ -453,6 +508,22 @@ function toggle(name, v){
   save();
   refreshCard(name);
   updateStats();
+}
+
+function toggleRarity(rarity){
+  collapsed[rarity]=!collapsed[rarity];
+  save();
+  const block=document.querySelector(`[data-rarity="${rarity}"]`);
+  if(!block) return;
+  const arrow=block.querySelector(".rarity-arrow");
+  const grid=block.querySelector(".droids-grid");
+  if(collapsed[rarity]){
+    arrow.classList.add("collapsed");
+    grid.style.display="none";
+  } else {
+    arrow.classList.remove("collapsed");
+    grid.style.display="grid";
+  }
 }
 
 function refreshCard(name){
@@ -579,15 +650,19 @@ function render(){
     const rc=ds.reduce((a,d)=>a+VARIANTS.filter(v=>col[d.name+"_"+v]).length,0);
     const pct=Math.round(rc/rt*100);
     const col_=R_COLORS[r];
-    html+=`<div class="rarity-block rarity-${r}">
-      <div class="rarity-hdr">
+    const isCollapsed=collapsed[r];
+    const arrowClass=isCollapsed?"rarity-arrow collapsed":"rarity-arrow";
+    const gridStyle=isCollapsed?'style="display:none"':'';
+    html+=`<div class="rarity-block rarity-${r}" data-rarity="${r}">
+      <div class="rarity-hdr" onclick="toggleRarity('${r}')">
+        <span class="${arrowClass}">▼</span>
         <span class="rarity-badge">${r}</span>
         <div class="rarity-prog">
           <div class="rp-bar"><div class="rp-fill" id="rfill-${r}" style="background:${col_};width:${pct}%"></div></div>
         </div>
         <span id="rprog-${r}" class="rarity-count">${rc}/${rt}</span>
       </div>
-      <div class="droids-grid">${vis.map(cardHTML).join("")}</div>
+      <div class="droids-grid" ${gridStyle}>${vis.map(cardHTML).join("")}</div>
     </div>`;
   });
   main.innerHTML=html;

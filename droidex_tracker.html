@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🤖 Droidex Tracker — Star Wars: Droid Tycoon</title>
+<style>
+:root {
+  --bg: #080a0f;
+  --surface: #0f1219;
+  --surface2: #161c27;
+  --border: #252d3d;
+  --text: #e8eaf0;
+  --muted: #5a6480;
+  --yellow: #ffe81a;
+  --common: #9ca3af;
+  --rare: #3b82f6;
+  --epic: #a855f7;
+  --legendary: #f59e0b;
+  --iconic: #e84545;
+  --worker: #4ade80;
+  --astro: #38bdf8;
+  --battle: #f87171;
+  --gold: #fbbf24;
+  --diamond: #67e8f9;
+  --rainbow: #a855f7;
+  --beskar: #94a3b8;
+  --galactic: #a78bfa;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,sans-serif;min-height:100vh;overflow-x:hidden;}
+
+/* ── STARFIELD BG ── */
+body::before{content:'';position:fixed;inset:0;background:
+  radial-gradient(ellipse at 20% 20%, rgba(59,130,246,0.04) 0%, transparent 50%),
+  radial-gradient(ellipse at 80% 80%, rgba(168,85,247,0.04) 0%, transparent 50%);
+  pointer-events:none;z-index:0;}
+
+/* ── HEADER ── */
+.header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(8,10,15,0.97);
+  border-bottom:2px solid var(--yellow);
+  backdrop-filter:blur(12px);
+  padding:14px 20px 10px;
+  box-shadow:0 4px 32px rgba(0,0,0,0.6);
+}
+.header-row1{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;margin-bottom:10px;}
+.logo{display:flex;flex-direction:column;}
+.logo-title{font-size:1.4rem;font-weight:800;color:var(--yellow);letter-spacing:1px;text-shadow:0 0 24px rgba(255,232,26,0.5);}
+.logo-sub{font-size:0.72rem;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:1px;}
+
+.stats-row{display:flex;align-items:center;gap:14px;flex-wrap:wrap;}
+.stat-box{text-align:center;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:5px 12px;}
+.stat-num{font-size:1.2rem;font-weight:800;color:var(--yellow);line-height:1;}
+.stat-lbl{font-size:0.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-top:2px;}
+
+.prog-wrap{min-width:180px;flex:1;}
+.prog-top{display:flex;justify-content:space-between;margin-bottom:4px;}
+.prog-top span{font-size:0.72rem;color:var(--muted);}
+.prog-top strong{font-size:0.72rem;color:var(--yellow);}
+.prog-track{background:var(--border);border-radius:999px;height:8px;overflow:hidden;}
+.prog-fill{background:linear-gradient(90deg,var(--yellow),#ff9500);height:100%;border-radius:999px;transition:width .5s ease;width:0%;}
+
+.reset-area{position:relative;}
+.btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:7px;border:none;cursor:pointer;font-size:0.82rem;font-weight:700;transition:opacity .15s,transform .1s;white-space:nowrap;}
+.btn:active{transform:scale(.97);}
+.btn:hover{opacity:.88;}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--text);}
+.btn-yellow{background:var(--yellow);color:#000;}
+.btn-red{background:#ef4444;color:#fff;}
+.btn-green{background:#22c55e;color:#000;}
+.confirm-row{display:none;align-items:center;gap:6px;flex-wrap:wrap;}
+
+/* ── API KEY ROW ── */
+.api-bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:7px 12px;margin-top:6px;}
+.api-bar label{font-size:0.76rem;color:var(--muted);white-space:nowrap;}
+.api-bar input{flex:1;min-width:180px;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:5px 10px;color:var(--text);font-size:0.82rem;font-family:monospace;}
+.api-bar input:focus{outline:none;border-color:var(--yellow);}
+#keyStatus{font-size:0.76rem;}
+
+/* ── FILTER BAR ── */
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;padding:10px 20px;background:var(--surface);border-bottom:1px solid var(--border);}
+.filter-bar input,.filter-bar select{background:var(--bg);border:1px solid var(--border);border-radius:7px;padding:7px 10px;color:var(--text);font-size:0.82rem;}
+.filter-bar input{flex:1;min-width:150px;}
+.filter-bar input:focus,.filter-bar select:focus{outline:none;border-color:var(--yellow);}
+.filter-bar select{cursor:pointer;}
+.filter-bar select option{background:var(--bg);}
+
+/* ── SCAN SECTION ── */
+.scan-section{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 20px;background:var(--surface2);border-bottom:1px solid var(--border);}
+.drop-zone{flex:1;min-width:200px;border:2px dashed var(--border);border-radius:10px;display:flex;align-items:center;justify-content:center;gap:10px;padding:10px 16px;cursor:pointer;transition:border-color .2s,background .2s;font-size:0.85rem;color:var(--muted);}
+.drop-zone:hover,.drop-zone.over{border-color:var(--yellow);background:rgba(255,232,26,0.04);color:var(--text);}
+.drop-zone input{display:none;}
+.drop-zone b{color:var(--text);font-size:0.88rem;}
+#imgPrev{max-height:38px;border-radius:4px;border:1px solid var(--border);display:none;}
+.scan-controls{display:flex;flex-direction:column;gap:6px;align-items:flex-start;}
+#scanStatus{font-size:0.76rem;color:var(--muted);max-width:260px;line-height:1.4;}
+
+/* ── SCANNING OVERLAY ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.78);z-index:500;flex-direction:column;align-items:center;justify-content:center;gap:14px;}
+.overlay.on{display:flex;}
+.spin{width:46px;height:46px;border:4px solid var(--border);border-top-color:var(--yellow);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.overlay-msg{color:var(--yellow);font-size:1rem;font-weight:700;}
+.overlay-sub{color:var(--muted);font-size:0.78rem;}
+
+/* ── MAIN ── */
+.main{padding:20px;max-width:1440px;margin:0 auto;position:relative;z-index:1;}
+
+/* ── RARITY SECTION ── */
+.rarity-block{margin-bottom:30px;}
+.rarity-hdr{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding-bottom:8px;border-bottom:2px solid;}
+.rarity-badge{padding:3px 11px;border-radius:999px;font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1.5px;}
+.rarity-Common .rarity-hdr{border-color:var(--common);}  .rarity-Common .rarity-badge{background:rgba(156,163,175,.15);color:var(--common);}
+.rarity-Rare   .rarity-hdr{border-color:var(--rare);}    .rarity-Rare   .rarity-badge{background:rgba(59,130,246,.15);color:var(--rare);}
+.rarity-Epic   .rarity-hdr{border-color:var(--epic);}    .rarity-Epic   .rarity-badge{background:rgba(168,85,247,.15);color:var(--epic);}
+.rarity-Legendary .rarity-hdr{border-color:var(--legendary);} .rarity-Legendary .rarity-badge{background:rgba(245,158,11,.15);color:var(--legendary);}
+.rarity-Iconic .rarity-hdr{border-color:var(--iconic);}  .rarity-Iconic .rarity-badge{background:rgba(232,69,69,.15);color:var(--iconic);}
+
+.rarity-prog{display:flex;align-items:center;gap:7px;font-size:0.74rem;}
+.rp-bar{width:70px;height:4px;background:var(--border);border-radius:999px;overflow:hidden;}
+.rp-fill{height:100%;border-radius:999px;transition:width .5s;}
+.rarity-count{margin-left:auto;font-size:0.76rem;color:var(--muted);}
+
+/* ── GRID ── */
+.droids-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:9px;}
+
+/* ── CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:11px 13px;transition:border-color .2s,background .2s;}
+.card:hover{background:var(--surface2);border-color:#333d52;}
+.card.all-done{border-color:#22c55e33;box-shadow:0 0 12px rgba(34,197,94,.08);}
+
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;}
+.droid-name{font-weight:700;font-size:0.92rem;color:var(--text);}
+.droid-meta{display:flex;align-items:center;gap:5px;margin-top:3px;}
+.type-badge{font-size:0.65rem;padding:2px 7px;border-radius:4px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
+.t-Worker   {background:rgba(74,222,128,.12);color:var(--worker);}
+.t-Astromech{background:rgba(56,189,248,.12);color:var(--astro);}
+.t-Battle   {background:rgba(248,113,113,.12);color:var(--battle);}
+.companion-badge{font-size:0.65rem;padding:2px 7px;border-radius:4px;font-weight:700;background:rgba(232,69,69,.12);color:var(--iconic);}
+.droid-stat{font-size:0.7rem;color:var(--muted);}
+
+.complete-badge{font-size:0.72rem;font-weight:700;white-space:nowrap;padding:2px 8px;border-radius:5px;}
+.complete-badge.done{color:#22c55e;background:rgba(34,197,94,.1);}
+.complete-badge.partial{color:var(--yellow);background:rgba(255,232,26,.08);}
+
+/* ── VARIANTS ── */
+.variants{display:flex;gap:5px;}
+.vbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 2px 5px;border-radius:8px;border:2px solid var(--border);background:var(--bg);cursor:pointer;transition:all .15s;user-select:none;min-width:0;}
+.vbtn:hover{border-color:#444f68;transform:translateY(-1px);}
+.vbtn:active{transform:translateY(0);}
+.v-icon{font-size:1.1rem;line-height:1;}
+.v-lbl{font-size:0.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);white-space:nowrap;}
+.v-dot{width:13px;height:13px;border-radius:50%;border:2px solid var(--border);font-size:0.55rem;display:flex;align-items:center;justify-content:center;transition:all .15s;color:transparent;}
+
+/* Collected states */
+.vbtn.c-Base   {border-color:#9ca3af;background:rgba(156,163,175,.08);}
+.vbtn.c-Gold   {border-color:var(--gold);background:rgba(251,191,36,.08);}
+.vbtn.c-Diamond{border-color:var(--diamond);background:rgba(103,232,249,.08);}
+.vbtn.c-Rainbow{border-color:var(--rainbow);background:rgba(168,85,247,.08);}
+.vbtn.c-Beskar  {border-color:var(--beskar);background:rgba(148,163,184,.08);}
+.vbtn.c-Galactic{border-color:var(--galactic);background:rgba(167,139,250,.08);box-shadow:0 0 8px rgba(167,139,250,.18);}
+
+.vbtn.c-Base .v-dot   {background:#9ca3af;border-color:#9ca3af;color:#000;}
+.vbtn.c-Gold .v-dot   {background:var(--gold);border-color:var(--gold);color:#000;}
+.vbtn.c-Diamond .v-dot{background:var(--diamond);border-color:var(--diamond);color:#000;}
+.vbtn.c-Rainbow .v-dot{background:var(--rainbow);border-color:var(--rainbow);color:#fff;}
+.vbtn.c-Beskar .v-dot {background:var(--beskar);border-color:var(--beskar);color:#000;}
+.vbtn.c-Galactic .v-dot{background:var(--galactic);border-color:var(--galactic);color:#000;}
+
+.vbtn.c-Base .v-lbl   {color:#9ca3af;}
+.vbtn.c-Gold .v-lbl   {color:var(--gold);}
+.vbtn.c-Diamond .v-lbl{color:var(--diamond);}
+.vbtn.c-Rainbow .v-lbl{color:var(--rainbow);}
+.vbtn.c-Beskar .v-lbl {color:var(--beskar);}
+.vbtn.c-Galactic .v-lbl{color:var(--galactic);}
+
+/* Rainbow icon effect */
+.vi-Rainbow{background:linear-gradient(135deg,#ff4d4d,#ffa500,#ffff00,#00cc44,#4488ff,#cc44ff);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* Galactic icon effect */
+.vi-Galactic{background:linear-gradient(135deg,#818cf8,#a78bfa,#67e8f9,#c084fc,#38bdf8);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:22px;right:22px;z-index:999;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 16px;font-size:0.84rem;box-shadow:0 8px 24px rgba(0,0,0,.5);transform:translateY(80px);opacity:0;transition:all .3s;max-width:280px;pointer-events:none;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.success{border-left:4px solid #22c55e;}
+.toast.error  {border-left:4px solid #ef4444;}
+.toast.info   {border-left:4px solid var(--yellow);}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:48px;color:var(--muted);font-size:1rem;}
+
+/* ── COMPANION NOTE ── */
+.companion-note{font-size:0.7rem;color:var(--muted);margin-top:6px;padding:4px 8px;background:rgba(232,69,69,.06);border-radius:5px;border-left:2px solid var(--iconic);}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:var(--bg);}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+</style>
+</head>
+<body>
+
+<!-- Scanning overlay -->
+<div class="overlay" id="overlay">
+  <div class="spin"></div>
+  <div class="overlay-msg">🤖 AI is scanning your Droidex…</div>
+  <div class="overlay-sub">Reading droids from your screenshot — this takes a few seconds</div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<!-- ══ HEADER ══ -->
+<header class="header">
+  <div class="header-row1">
+    <div class="logo">
+      <div class="logo-title">⚙️ DROIDEX TRACKER</div>
+      <div class="logo-sub">Star Wars: Droid Tycoon · Fortnite</div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-box">
+        <div class="stat-num" id="sCollected">0</div>
+        <div class="stat-lbl">Collected</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="sTotal">0</div>
+        <div class="stat-lbl">Total</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="sDroids">0</div>
+        <div class="stat-lbl">Droids</div>
+      </div>
+      <div class="prog-wrap">
+        <div class="prog-top"><span>Overall Progress</span><strong id="sPct">0%</strong></div>
+        <div class="prog-track"><div class="prog-fill" id="progFill"></div></div>
+      </div>
+
+      <div class="reset-area">
+        <button class="btn btn-outline" id="resetBtn" onclick="startReset()">🔄 Reset</button>
+        <div class="confirm-row" id="confirmRow">
+          <span style="font-size:.78rem;color:#ef4444">Erase all?</span>
+          <button class="btn btn-red" onclick="doReset()">Yes</button>
+          <button class="btn btn-outline" onclick="cancelReset()">No</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="api-bar">
+    <label>🔑 OpenAI Key</label>
+    <input type="password" id="apiKey" placeholder="sk-proj-…  (paste your key here)" />
+    <button class="btn btn-yellow" onclick="saveKey()">Save</button>
+    <button class="btn btn-outline" onclick="testKey()" id="testKeyBtn" style="display:none">Test Key</button>
+    <span id="keyStatus" style="color:var(--muted);font-size:.76rem;"></span>
+    <span style="font-size:.72rem;color:var(--muted);margin-left:auto;">Used only for AI screenshot scanning · stored in your browser only</span>
+  </div>
+</header>
+
+<!-- ══ FILTERS ══ -->
+<div class="filter-bar">
+  <input type="text" id="search" placeholder="🔍  Search droids…" oninput="render()" />
+  <select id="fRarity" onchange="render()">
+    <option value="">All Rarities</option>
+    <option value="Common">Common</option>
+    <option value="Rare">Rare</option>
+    <option value="Epic">Epic</option>
+    <option value="Legendary">Legendary</option>
+    <option value="Iconic">Iconic</option>
+  </select>
+  <select id="fType" onchange="render()">
+    <option value="">All Types</option>
+    <option value="Worker">Worker</option>
+    <option value="Astromech">Astromech</option>
+    <option value="Battle">Battle</option>
+  </select>
+  <select id="fStatus" onchange="render()">
+    <option value="">All Droids</option>
+    <option value="missing">Missing Any Variant</option>
+    <option value="complete">Fully Complete (5/5)</option>
+    <option value="partial">Partially Collected</option>
+    <option value="none">Not Started</option>
+  </select>
+</div>
+
+<!-- ══ SCREENSHOT SCAN ══ -->
+<div class="scan-section">
+  <div class="drop-zone" id="dropZone"
+       onclick="document.getElementById('fileIn').click()"
+       ondragover="dragOver(event)" ondragleave="dragLeave()" ondrop="onDrop(event)">
+    <input type="file" id="fileIn" accept="image/*" onchange="filePick(event)" />
+    <span style="font-size:1.5rem">📸</span>
+    <div>
+      <b>Upload Droidex Screenshot</b>
+      <div style="font-size:.76rem;margin-top:2px;">Click or drag &amp; drop — AI will auto-detect your collected droids</div>
+    </div>
+    <img id="imgPrev" />
+  </div>
+  <div class="scan-controls">
+    <button class="btn btn-yellow" id="scanBtn" onclick="doScan()" disabled>🤖 Scan with AI</button>
+    <div id="scanStatus"></div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main" id="main"></div>
+
+<script>
+// ────────────────────────────────────────────────────────
+//  DROID DATA
+// ────────────────────────────────────────────────────────
+const DROIDS = [
+  // ─ COMMON ─
+  {name:"Mouse",         rarity:"Common",    type:"Worker",    cost:"950",   income:"2/s",      sell:"665",    ct:"0:00:33"},
+  {name:"Pit",           rarity:"Common",    type:"Worker",    cost:"1.1k",  income:"2/s",      sell:"770",    ct:"0:00:33"},
+  {name:"Gonk",          rarity:"Common",    type:"Worker",    cost:"3k",    income:"4/s",      sell:"2.1k",   ct:"0:00:37"},
+  {name:"CB",            rarity:"Common",    type:"Astromech", cost:"2k",    income:"3/s",      sell:"1.4k",   ct:"0:00:35"},
+  {name:"R3",            rarity:"Common",    type:"Astromech", cost:"2k",    income:"3/s",      sell:"1.4k",   ct:"0:00:35"},
+  {name:"R5",            rarity:"Common",    type:"Astromech", cost:"2k",    income:"3/s",      sell:"1.4k",   ct:"0:00:35"},
+  {name:"R8",            rarity:"Common",    type:"Astromech", cost:"3k",    income:"4/s",      sell:"2.1k",   ct:"0:00:37"},
+  {name:"Imperial Probe",rarity:"Common",    type:"Battle",    cost:"5k",    income:"6/s",      sell:"3.5k",   ct:"0:00:40"},
+  {name:"B1 Battle",     rarity:"Common",    type:"Battle",    cost:"4k",    income:"5/s",      sell:"2.8k",   ct:"0:00:38"},
+  {name:"DRK-1 Probe",   rarity:"Common",    type:"Battle",    cost:"3k",    income:"3/s",      sell:"2.1k",   ct:"0:00:35"},
+  {name:"ID10",          rarity:"Common",    type:"Battle",    cost:"4k",    income:"4/s",      sell:"2.8k",   ct:"0:00:37"},
+  // ─ RARE ─
+  {name:"BDX Explorer",  rarity:"Rare",      type:"Worker",    cost:"25k",   income:"15/s",     sell:"17.5k",  ct:"0:00:56"},
+  {name:"ARG",           rarity:"Rare",      type:"Worker",    cost:"88k",   income:"42/s",     sell:"61.6k",  ct:"0:01:43"},
+  {name:"Senate Hovercam",rarity:"Rare",     type:"Worker",    cost:"100k",  income:"46/s",     sell:"70k",    ct:"0:01:50"},
+  {name:"BU-4D",         rarity:"Rare",      type:"Worker",    cost:"130k",  income:"58/s",     sell:"91k",    ct:"0:02:11"},
+  {name:"Bal-Core",      rarity:"Rare",      type:"Worker",    cost:"43k",   income:"23/s",     sell:"30.1k",  ct:"0:01:10"},
+  {name:"Roll-R",        rarity:"Rare",      type:"Worker",    cost:"62k",   income:"31/s",     sell:"43.4k",  ct:"0:01:24"},
+  {name:"2BB",           rarity:"Rare",      type:"Astromech", cost:"30k",   income:"17/s",     sell:"21k",    ct:"0:00:59"},
+  {name:"A-LT",          rarity:"Rare",      type:"Astromech", cost:"74k",   income:"36/s",     sell:"51.8k",  ct:"0:01:33"},
+  {name:"R4",            rarity:"Rare",      type:"Astromech", cost:"110k",  income:"50/s",     sell:"77k",    ct:"0:01:57"},
+  {name:"R9",            rarity:"Rare",      type:"Astromech", cost:"120k",  income:"54/s",     sell:"84k",    ct:"0:02:04"},
+  {name:"B1 Security",   rarity:"Rare",      type:"Battle",    cost:"150k",  income:"66/s",     sell:"105k",   ct:"0:02:25"},
+  {name:"NAV-EX",        rarity:"Rare",      type:"Battle",    cost:"36k",   income:"18/s",     sell:"25.2k",  ct:"0:01:01"},
+  {name:"Vect-Arm",      rarity:"Rare",      type:"Battle",    cost:"52k",   income:"27/s",     sell:"36.4k",  ct:"0:01:17"},
+  {name:"HOV-R",         rarity:"Rare",      type:"Battle",    cost:"140k",  income:"62/s",     sell:"98k",    ct:"0:02:18"},
+  // ─ EPIC ─
+  {name:"Groundmech",    rarity:"Epic",      type:"Worker",    cost:"900k",  income:"120/s",    sell:"630k",   ct:"0:04:00"},
+  {name:"LO",            rarity:"Epic",      type:"Worker",    cost:"2.1m",  income:"240/s",    sell:"1.47m",  ct:"0:07:31"},
+  {name:"AMP Walker",    rarity:"Epic",      type:"Worker",    cost:"5.4m",  income:"570/s",    sell:"3.78m",  ct:"0:17:10"},
+  {name:"Sen-Tri",       rarity:"Epic",      type:"Worker",    cost:"4.8m",  income:"510/s",    sell:"3.36m",  ct:"0:15:25"},
+  {name:"Opti-Pod",      rarity:"Epic",      type:"Worker",    cost:"3.6m",  income:"390/s",    sell:"2.52m",  ct:"0:11:54"},
+  {name:"Gunrunner",     rarity:"Epic",      type:"Worker",    cost:"6.3m",  income:"660/s",    sell:"4.41m",  ct:"0:19:48"},
+  {name:"BB",            rarity:"Epic",      type:"Astromech", cost:"1.2m",  income:"150/s",    sell:"840k",   ct:"0:04:53"},
+  {name:"R2",            rarity:"Epic",      type:"Astromech", cost:"3.3m",  income:"360/s",    sell:"2.31m",  ct:"0:11:01"},
+  {name:"R6",            rarity:"Epic",      type:"Astromech", cost:"2.7m",  income:"300/s",    sell:"1.89m",  ct:"0:09:16"},
+  {name:"Trak-R",        rarity:"Epic",      type:"Astromech", cost:"3m",    income:"360/s",    sell:"2.1m",   ct:"0:10:09"},
+  {name:"Orb-Walker",    rarity:"Epic",      type:"Astromech", cost:"1.5m",  income:"180/s",    sell:"1.05m",  ct:"0:05:45"},
+  {name:"Util-Tech",     rarity:"Epic",      type:"Astromech", cost:"1.8m",  income:"210/s",    sell:"1.26m",  ct:"0:06:38"},
+  {name:"B1 Heavy",      rarity:"Epic",      type:"Battle",    cost:"6m",    income:"630/s",    sell:"4.2m",   ct:"0:18:03"},
+  {name:"B2 Super",      rarity:"Epic",      type:"Battle",    cost:"3.9m",  income:"420/s",    sell:"2.73m",  ct:"0:12:47"},
+  {name:"B2 Heavy",      rarity:"Epic",      type:"Battle",    cost:"4.5m",  income:"480/s",    sell:"3.15m",  ct:"0:14:32"},
+  {name:"Strike-Orb",    rarity:"Epic",      type:"Battle",    cost:"5.1m",  income:"540/s",    sell:"3.57m",  ct:"0:16:17"},
+  {name:"Haul-R",        rarity:"Epic",      type:"Battle",    cost:"2.4m",  income:"270/s",    sell:"1.68m",  ct:"0:08:23"},
+  {name:"LNG-Shot",      rarity:"Epic",      type:"Battle",    cost:"4.2m",  income:"450/s",    sell:"2.94m",  ct:"0:13:39"},
+  // ─ LEGENDARY ─
+  {name:"Proto-Roller",  rarity:"Legendary", type:"Worker",    cost:"22m",   income:"972/s",    sell:"15.4m",  ct:"0:28:55"},
+  {name:"Mecha-Droid",   rarity:"Legendary", type:"Worker",    cost:"29m",   income:"1.24k/s",  sell:"20.3m",  ct:"0:36:53"},
+  {name:"Mono-Walker",   rarity:"Legendary", type:"Worker",    cost:"37m",   income:"1.5k/s",   sell:"25.9m",  ct:"0:44:22"},
+  {name:"BB9",           rarity:"Legendary", type:"Astromech", cost:"28m",   income:"1.3k/s",   sell:"19.6m",  ct:"0:38:00"},
+  {name:"R7",            rarity:"Legendary", type:"Astromech", cost:"37m",   income:"1.5k/s",   sell:"25.9m",  ct:"0:44:22"},
+  {name:"B2-RP",         rarity:"Legendary", type:"Battle",    cost:"31m",   income:"1.3k/s",   sell:"21.7m",  ct:"0:38:38"},
+  {name:"Cyclo-Grav",    rarity:"Legendary", type:"Battle",    cost:"30m",   income:"1.26k/s",  sell:"21m",    ct:"0:37:21"},
+  {name:"Opti-Strike",   rarity:"Legendary", type:"Battle",    cost:"37m",   income:"1.5k/s",   sell:"25.9m",  ct:"0:44:22"},
+  // ─ ICONIC (Companion droids — no cost, give % income bonus) ─
+  {name:"DJ R-3X",       rarity:"Iconic",    type:"Worker",    cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
+  {name:"CB-23",         rarity:"Iconic",    type:"Astromech", cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
+  {name:"BB8",           rarity:"Iconic",    type:"Astromech", cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
+  {name:"Mister Bones",  rarity:"Iconic",    type:"Battle",    cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
+  {name:"IG-11 Marshal", rarity:"Iconic",    type:"Battle",    cost:"N/A",   income:"15% bonus",sell:"N/A",    ct:"N/A", companion:true},
+];
+
+const VARIANTS  = ["Base","Gold","Diamond","Rainbow","Beskar","Galactic"];
+const V_ICONS   = {Base:"⬜",Gold:"🟡",Diamond:"💎",Rainbow:"🌈",Beskar:"🔩",Galactic:"🌌"};
+const R_ORDER   = ["Common","Rare","Epic","Legendary","Iconic"];
+const R_COLORS  = {Common:"#9ca3af",Rare:"#3b82f6",Epic:"#a855f7",Legendary:"#f59e0b",Iconic:"#e84545"};
+
+// ────────────────────────────────────────────────────────
+//  STATE
+// ────────────────────────────────────────────────────────
+let col = {}; // {name_Variant: true}
+
+function load(){
+  try{ const r=localStorage.getItem("droidex_v2"); if(r) col=JSON.parse(r); }catch(e){}
+}
+function save(){ localStorage.setItem("droidex_v2",JSON.stringify(col)); }
+
+// ────────────────────────────────────────────────────────
+//  API KEY
+// ────────────────────────────────────────────────────────
+function loadKey(){
+  const k=localStorage.getItem("droidex_key");
+  if(k){
+    document.getElementById("apiKey").value=k;
+    document.getElementById("keyStatus").textContent="✓ Key saved";
+    document.getElementById("keyStatus").style.color="#22c55e";
+    document.getElementById("testKeyBtn").style.display="";
+  }
+}
+function saveKey(){
+  const k=document.getElementById("apiKey").value.trim();
+  if(!k.startsWith("sk-")){ toast("⚠️ Key should start with sk- or sk-proj-","error"); return; }
+  localStorage.setItem("droidex_key",k);
+  document.getElementById("keyStatus").textContent="✓ Key saved";
+  document.getElementById("keyStatus").style.color="#22c55e";
+  document.getElementById("testKeyBtn").style.display="";
+  toast("✅ API key saved!","success");
+}
+
+async function testKey(){
+  const key=localStorage.getItem("droidex_key");
+  if(!key){ toast("⚠️ No key saved yet","error"); return; }
+  const statusEl=document.getElementById("keyStatus");
+  statusEl.textContent="⏳ Testing…";
+  statusEl.style.color="var(--muted)";
+  try{
+    const res=await fetch("https://api.openai.com/v1/models",{
+      headers:{"Authorization":"Bearer "+key}
+    });
+    if(res.ok){
+      statusEl.textContent="✅ Key is valid & working!";
+      statusEl.style.color="#22c55e";
+      toast("✅ OpenAI key is working!","success");
+    } else {
+      const e=await res.json();
+      statusEl.textContent="❌ "+( e.error?.message||"Invalid key (status "+res.status+")");
+      statusEl.style.color="#ef4444";
+      toast("❌ Key error: "+(e.error?.message||res.status),"error");
+    }
+  }catch(err){
+    statusEl.textContent="❌ Network error: "+err.message;
+    statusEl.style.color="#ef4444";
+    toast("❌ Network error — check your connection","error");
+  }
+}
+
+// ────────────────────────────────────────────────────────
+//  TOGGLE
+// ────────────────────────────────────────────────────────
+function toggle(name, v){
+  const key=name+"_"+v;
+  col[key]=!col[key];
+  if(!col[key]) delete col[key];
+  save();
+  refreshCard(name);
+  updateStats();
+}
+
+function refreshCard(name){
+  const card=document.querySelector(`[data-droid="${CSS.escape(name)}"]`);
+  if(!card) return;
+  const n=VARIANTS.filter(v=>col[name+"_"+v]).length;
+  // update each vbtn
+  VARIANTS.forEach(v=>{
+    const btn=card.querySelector(`[data-v="${v}"]`);
+    if(!btn) return;
+    const on=!!col[name+"_"+v];
+    btn.className="vbtn"+(on?" c-"+v:"");
+    btn.querySelector(".v-dot").textContent=on?"✓":"";
+  });
+  // badge
+  const badge=card.querySelector(".complete-badge");
+  if(badge){
+    if(n===VARIANTS.length){badge.textContent="✨ Complete!";badge.className="complete-badge done";}
+    else if(n>0){badge.textContent=n+"/"+VARIANTS.length;badge.className="complete-badge partial";}
+    else{badge.textContent="";badge.className="complete-badge";}
+  }
+  card.classList.toggle("all-done", n===VARIANTS.length);
+}
+
+// ────────────────────────────────────────────────────────
+//  STATS
+// ────────────────────────────────────────────────────────
+function updateStats(){
+  const total = DROIDS.length * VARIANTS.length;
+  const cnt   = Object.keys(col).length;
+  const dCnt  = DROIDS.filter(d=>VARIANTS.some(v=>col[d.name+"_"+v])).length;
+  const pct   = total>0 ? Math.round(cnt/total*100) : 0;
+  document.getElementById("sCollected").textContent=cnt;
+  document.getElementById("sTotal").textContent=total;
+  document.getElementById("sDroids").textContent=dCnt+"/"+DROIDS.length;
+  document.getElementById("sPct").textContent=pct+"%";
+  document.getElementById("progFill").style.width=pct+"%";
+
+  // per-rarity bars
+  R_ORDER.forEach(r=>{
+    const ds=DROIDS.filter(d=>d.rarity===r);
+    const rt=ds.length*VARIANTS.length;
+    const rc=ds.reduce((a,d)=>a+VARIANTS.filter(v=>col[d.name+"_"+v]).length,0);
+    const el=document.getElementById("rprog-"+r);
+    if(el){ el.textContent=rc+"/"+rt; }
+    const fill=document.getElementById("rfill-"+r);
+    if(fill){ fill.style.width=(rc/rt*100)+"%"; }
+  });
+}
+
+// ────────────────────────────────────────────────────────
+//  RENDER
+// ────────────────────────────────────────────────────────
+function filtered(){
+  const q=document.getElementById("search").value.toLowerCase();
+  const fr=document.getElementById("fRarity").value;
+  const ft=document.getElementById("fType").value;
+  const fs=document.getElementById("fStatus").value;
+  return DROIDS.filter(d=>{
+    if(q && !d.name.toLowerCase().includes(q)) return false;
+    if(fr && d.rarity!==fr) return false;
+    if(ft && d.type!==ft) return false;
+    if(fs){
+      const n=VARIANTS.filter(v=>col[d.name+"_"+v]).length;
+      if(fs==="complete" && n!==VARIANTS.length) return false;
+      if(fs==="missing"  && n===VARIANTS.length) return false;
+      if(fs==="partial"  && (n===0||n===VARIANTS.length)) return false;
+      if(fs==="none"     && n>0) return false;
+    }
+    return true;
+  });
+}
+
+function cardHTML(d){
+  const n=VARIANTS.filter(v=>col[d.name+"_"+v]).length;
+  const done=n===VARIANTS.length;
+  const typeClass="t-"+d.type;
+  let badge="";
+  if(done) badge=`<span class="complete-badge done">✨ Complete!</span>`;
+  else if(n>0) badge=`<span class="complete-badge partial">${n}/${VARIANTS.length}</span>`;
+
+  const varBtns=VARIANTS.map(v=>{
+    const on=!!col[d.name+"_"+v];
+    const iconClass=v==="Rainbow"?"vi-Rainbow":v==="Galactic"?"vi-Galactic":"";
+    // safe name for JS string — escape single quotes
+    const safeName=d.name.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+    return `<div class="vbtn${on?" c-"+v:""}" data-v="${v}" onclick="toggle('${safeName}','${v}')" title="${d.name} — ${v}">
+      <span class="v-icon ${iconClass}">${V_ICONS[v]}</span>
+      <span class="v-lbl">${v}</span>
+      <div class="v-dot">${on?"✓":""}</div>
+    </div>`;
+  }).join("");
+
+  const statLine=d.companion
+    ? `<span class="companion-badge">Companion</span>`
+    : `<span class="type-badge ${typeClass}">${d.type}</span><span class="droid-stat">${d.income} · Cost: ${d.cost}</span>`;
+
+  return `<div class="card${done?" all-done":""}" data-droid="${d.name}">
+    <div class="card-top">
+      <div>
+        <div class="droid-name">${d.name}</div>
+        <div class="droid-meta">${statLine}</div>
+      </div>
+      ${badge}
+    </div>
+    <div class="variants">${varBtns}</div>
+    ${d.companion?`<div class="companion-note">🎵 Companion droid — gives +15% income bonus to its type when placed</div>`:""}
+  </div>`;
+}
+
+function render(){
+  const main=document.getElementById("main");
+  const list=filtered();
+  if(!list.length){
+    main.innerHTML='<div class="empty">🤖 No droids match your filters.</div>';
+    return;
+  }
+  let html="";
+  R_ORDER.forEach(r=>{
+    const ds=DROIDS.filter(d=>d.rarity===r);
+    const vis=list.filter(d=>d.rarity===r);
+    if(!vis.length) return;
+    const rt=ds.length*VARIANTS.length;
+    const rc=ds.reduce((a,d)=>a+VARIANTS.filter(v=>col[d.name+"_"+v]).length,0);
+    const pct=Math.round(rc/rt*100);
+    const col_=R_COLORS[r];
+    html+=`<div class="rarity-block rarity-${r}">
+      <div class="rarity-hdr">
+        <span class="rarity-badge">${r}</span>
+        <div class="rarity-prog">
+          <div class="rp-bar"><div class="rp-fill" id="rfill-${r}" style="background:${col_};width:${pct}%"></div></div>
+        </div>
+        <span id="rprog-${r}" class="rarity-count">${rc}/${rt}</span>
+      </div>
+      <div class="droids-grid">${vis.map(cardHTML).join("")}</div>
+    </div>`;
+  });
+  main.innerHTML=html;
+}
+
+// ────────────────────────────────────────────────────────
+//  SCREENSHOT SCAN
+// ────────────────────────────────────────────────────────
+let selFile=null;
+
+function dragOver(e){e.preventDefault();document.getElementById("dropZone").classList.add("over");}
+function dragLeave(){document.getElementById("dropZone").classList.remove("over");}
+function onDrop(e){
+  e.preventDefault();
+  document.getElementById("dropZone").classList.remove("over");
+  const f=e.dataTransfer.files[0];
+  if(f&&f.type.startsWith("image/")) setFile(f);
+}
+function filePick(e){ const f=e.target.files[0]; if(f) setFile(f); }
+function setFile(f){
+  selFile=f;
+  const p=document.getElementById("imgPrev");
+  p.src=URL.createObjectURL(f); p.style.display="block";
+  document.getElementById("scanBtn").disabled=false;
+  document.getElementById("scanStatus").textContent="📁 "+f.name+" — ready to scan";
+}
+
+async function doScan(){
+  const key=localStorage.getItem("droidex_key");
+  if(!key){ toast("⚠️ Paste and save your OpenAI key first!","error"); return; }
+  if(!selFile) return;
+  document.getElementById("overlay").classList.add("on");
+  document.getElementById("scanBtn").disabled=true;
+
+  try{
+    const b64=await toB64(selFile);
+    const names=DROIDS.map(d=>d.name).join(", ");
+
+    // Detect correct MIME type from the file itself
+    const mimeType = selFile.type || "image/png";
+
+    const prompt=`You are analyzing a screenshot from "Star Wars: Droid Tycoon" (a Fortnite Creative game). The Droidex is the droid collection screen showing a grid of droid cards.
+
+In the Droidex:
+- COLLECTED droids: appear bright, vivid, fully colored, and clearly labeled
+- UNCOLLECTED droids: appear darkened, grayed-out, silhouetted, or show a lock icon
+
+Complete list of all droids in the game: ${names}
+
+Quality variants for each droid: Base (standard/default), Gold (golden color), Diamond (blue/cyan sparkle), Rainbow (multicolored/prismatic), Beskar (silver/dark metallic steel), Galactic (cosmic/galaxy swirling purple-blue effect)
+
+Carefully analyze this Droidex screenshot. Identify every droid card that appears COLLECTED (bright/colored). For each collected droid, also identify its variant if visible.
+
+Respond with ONLY valid JSON (no markdown, no explanation):
+{
+  "found": [
+    {"name": "exact droid name from the list above", "variant": "Base"}
+  ],
+  "confidence": "low|medium|high",
+  "notes": "brief observation"
+}
+
+If the variant is not clearly visible, default to "Base". Match droid names exactly as listed.`;
+
+    const res=await fetch("https://api.openai.com/v1/chat/completions",{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},
+      body:JSON.stringify({
+        model:"gpt-4o",
+        max_tokens:2000,
+        messages:[{role:"user",content:[
+          {type:"text",text:prompt},
+          {type:"image_url",image_url:{url:`data:${mimeType};base64,`+b64,detail:"high"}}
+        ]}]
+      })
+    });
+
+    if(!res.ok){
+      const e=await res.json();
+      throw new Error(e.error?.message||"API error "+res.status);
+    }
+
+    const data=await res.json();
+    const raw=data.choices[0].message.content.trim();
+
+    let parsed;
+    try{
+      const m=raw.match(/\{[\s\S]*\}/);
+      if(m) parsed=JSON.parse(m[0]);
+      else throw new Error("AI returned no JSON. Raw response: "+raw.slice(0,200));
+    }catch(e){
+      throw new Error("Could not parse AI response: "+e.message);
+    }
+
+    let added=0;
+    (parsed.found||[]).forEach(item=>{
+      const d=DROIDS.find(x=>
+        x.name.toLowerCase()===item.name?.toLowerCase()||
+        x.name.toLowerCase().replace(/[^a-z0-9]/g,"").includes(
+          (item.name||"").toLowerCase().replace(/[^a-z0-9]/g,""))
+      );
+      const vv=VARIANTS.find(v=>v.toLowerCase()===(item.variant||"").toLowerCase())||"Base";
+      if(d){
+        const k=d.name+"_"+vv;
+        if(!col[k]){ col[k]=true; added++; }
+      }
+    });
+
+    save(); render(); updateStats();
+
+    const conf=parsed.confidence||"?";
+    const status=document.getElementById("scanStatus");
+    status.innerHTML=`✅ Found <b>${(parsed.found||[]).length}</b> collected droids, <b>${added}</b> newly marked. Confidence: <b>${conf}</b>`
+      +(parsed.notes?`<br><small style="color:var(--muted)">${parsed.notes}</small>`:"");
+    toast(`✅ Scan done! ${added} new droids marked.`,"success");
+
+  }catch(e){
+    document.getElementById("scanStatus").textContent="❌ "+e.message;
+    toast("❌ "+e.message,"error");
+  }finally{
+    document.getElementById("overlay").classList.remove("on");
+    document.getElementById("scanBtn").disabled=false;
+  }
+}
+
+function toB64(file){
+  return new Promise((res,rej)=>{
+    const r=new FileReader();
+    r.onload=()=>res(r.result.split(",")[1]);
+    r.onerror=rej;
+    r.readAsDataURL(file);
+  });
+}
+
+// ────────────────────────────────────────────────────────
+//  RESET
+// ────────────────────────────────────────────────────────
+function startReset(){
+  document.getElementById("resetBtn").style.display="none";
+  document.getElementById("confirmRow").style.display="flex";
+}
+function cancelReset(){
+  document.getElementById("resetBtn").style.display="";
+  document.getElementById("confirmRow").style.display="none";
+}
+function doReset(){
+  col={};save();render();updateStats();cancelReset();
+  toast("🔄 Collection reset.","info");
+}
+
+// ────────────────────────────────────────────────────────
+//  TOAST
+// ────────────────────────────────────────────────────────
+let tt;
+function toast(msg,type="info"){
+  const el=document.getElementById("toast");
+  el.textContent=msg; el.className="toast "+type+" show";
+  clearTimeout(tt); tt=setTimeout(()=>el.classList.remove("show"),3600);
+}
+
+// ────────────────────────────────────────────────────────
+//  INIT
+// ────────────────────────────────────────────────────────
+load(); loadKey(); render(); updateStats();
+</script>
+</body>
+</html>

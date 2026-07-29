@@ -149,7 +149,12 @@ body::before{content:'';position:fixed;inset:0;background:
 .card:hover{background:var(--surface2);border-color:#333d52;}
 .card.all-done{border-color:#22c55e33;box-shadow:0 0 12px rgba(34,197,94,.08);}
 
-.card-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px;}
+.card-inner{display:flex;gap:10px;align-items:flex-start;margin-bottom:9px;}
+.card-img-wrap{flex-shrink:0;width:64px;height:64px;border-radius:8px;background:var(--bg);border:1px solid var(--border);overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.card-img-wrap img{width:100%;height:100%;object-fit:contain;transition:opacity .2s;}
+.card-img-wrap img.uncollected{opacity:0.35;filter:grayscale(80%);}
+.card-body{flex:1;min-width:0;}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;}
 .droid-name{font-weight:700;font-size:0.92rem;color:var(--text);}
 .droid-meta{display:flex;align-items:center;gap:5px;margin-top:3px;}
 .type-badge{font-size:0.65rem;padding:2px 7px;border-radius:4px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;}
@@ -413,6 +418,24 @@ const V_ICONS   = {Base:"⬜",Gold:"🟡",Diamond:"💎",Rainbow:"🌈",Beskar:"
 const R_ORDER   = ["Common","Rare","Epic","Legendary","Iconic"];
 const R_COLORS  = {Common:"#9ca3af",Rare:"#3b82f6",Epic:"#a855f7",Legendary:"#f59e0b",Iconic:"#e84545"};
 
+// ── IMAGES ──
+const IMG_BASE = "https://raw.githubusercontent.com/erikpeik/droidex/main/public/droids/";
+const V_IMGKEY = {Base:"DEFAULT",Gold:"GOLD",Diamond:"DIAMOND",Rainbow:"RAINBOW",Beskar:"BESKAR",Galactic:"BESKAR"};
+// Special overrides where auto-name doesn't match file
+const IMG_OVERRIDES = {"Util-Tech":"UTIL-TEC","DJ R-3X":"DJ-R3X"};
+
+function getDroidImgKey(name){
+  return IMG_OVERRIDES[name] || name.toUpperCase().replace(/ /g,"_");
+}
+function getDroidImgUrl(d){
+  const key=getDroidImgKey(d.name);
+  const tierOrder=["Galactic","Beskar","Rainbow","Diamond","Gold","Base"];
+  for(const v of tierOrder){
+    if(col[d.name+"_"+v]) return {url:IMG_BASE+key+"_"+V_IMGKEY[v]+".png", collected:true};
+  }
+  return {url:IMG_BASE+key+"_DEFAULT.png", collected:false};
+}
+
 // ────────────────────────────────────────────────────────
 //  STATE
 // ────────────────────────────────────────────────────────
@@ -530,6 +553,7 @@ function refreshCard(name){
   const card=document.querySelector(`[data-droid="${CSS.escape(name)}"]`);
   if(!card) return;
   const n=VARIANTS.filter(v=>col[name+"_"+v]).length;
+  const d=DROIDS.find(x=>x.name===name);
   // update each vbtn
   VARIANTS.forEach(v=>{
     const btn=card.querySelector(`[data-v="${v}"]`);
@@ -538,6 +562,15 @@ function refreshCard(name){
     btn.className="vbtn"+(on?" c-"+v:"");
     btn.querySelector(".v-dot").textContent=on?"✓":"";
   });
+  // update image
+  if(d){
+    const img=card.querySelector(".droid-card-img");
+    if(img){
+      const {url,collected}=getDroidImgUrl(d);
+      img.src=url;
+      img.className="droid-card-img "+(collected?"":"uncollected");
+    }
+  }
   // badge
   const badge=card.querySelector(".complete-badge");
   if(badge){
@@ -608,7 +641,6 @@ function cardHTML(d){
   const varBtns=VARIANTS.map(v=>{
     const on=!!col[d.name+"_"+v];
     const iconClass=v==="Rainbow"?"vi-Rainbow":v==="Galactic"?"vi-Galactic":"";
-    // safe name for JS string — escape single quotes
     const safeName=d.name.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
     return `<div class="vbtn${on?" c-"+v:""}" data-v="${v}" onclick="toggle('${safeName}','${v}')" title="${d.name} — ${v}">
       <span class="v-icon ${iconClass}">${V_ICONS[v]}</span>
@@ -621,13 +653,23 @@ function cardHTML(d){
     ? `<span class="companion-badge">Companion</span>`
     : `<span class="type-badge ${typeClass}">${d.type}</span><span class="droid-stat">${d.income} · Cost: ${d.cost}</span>`;
 
+  const {url:imgUrl, collected:imgCollected}=getDroidImgUrl(d);
+  const imgClass=imgCollected?"":"uncollected";
+
   return `<div class="card${done?" all-done":""}" data-droid="${d.name}">
-    <div class="card-top">
-      <div>
-        <div class="droid-name">${d.name}</div>
-        <div class="droid-meta">${statLine}</div>
+    <div class="card-inner">
+      <div class="card-img-wrap">
+        <img class="droid-card-img ${imgClass}" src="${imgUrl}" alt="${d.name}" onerror="this.parentElement.style.display='none'" />
       </div>
-      ${badge}
+      <div class="card-body">
+        <div class="card-top">
+          <div>
+            <div class="droid-name">${d.name}</div>
+            <div class="droid-meta">${statLine}</div>
+          </div>
+          ${badge}
+        </div>
+      </div>
     </div>
     <div class="variants">${varBtns}</div>
     ${d.companion?`<div class="companion-note">🎵 Companion droid — gives +15% income bonus to its type when placed</div>`:""}

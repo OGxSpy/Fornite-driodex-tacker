@@ -210,6 +210,76 @@ body::before{content:'';position:fixed;inset:0;background:
 .vi-Galactic{background:linear-gradient(135deg,#818cf8,#a78bfa,#67e8f9,#c084fc,#38bdf8);
   -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 
+/* ══════════ GAME-STYLE DROIDEX VIEW ══════════ */
+.game-layout{display:flex;gap:18px;padding:18px 20px 40px;max-width:1500px;margin:0 auto;position:relative;z-index:1;align-items:flex-start;}
+
+/* Variant rail (left sidebar) */
+.variant-rail{position:sticky;top:150px;flex-shrink:0;display:flex;flex-direction:column;gap:9px;width:172px;}
+.rail-title{font-size:0.66rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:0 4px 2px;}
+.vtab{position:relative;padding:13px 15px;border-radius:9px;border:2px solid var(--border);background:linear-gradient(135deg,var(--surface),var(--surface2));color:var(--muted);font-weight:800;font-size:0.92rem;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;text-align:left;transition:all .18s;user-select:none;overflow:hidden;}
+.vtab:hover{border-color:#5a6480;color:var(--text);transform:translateX(3px);}
+.vtab .vt-count{display:block;font-size:0.6rem;font-weight:700;letter-spacing:.5px;margin-top:4px;opacity:.85;text-transform:none;}
+.vtab .vt-dot{position:absolute;top:10px;right:12px;width:9px;height:9px;border-radius:50%;background:var(--border);transition:all .2s;}
+.vtab.active{color:#fff;}
+.vtab.active[data-variant="Base"]    {border-color:#9ca3af;background:linear-gradient(135deg,rgba(156,163,175,.28),rgba(156,163,175,.08));box-shadow:0 0 20px rgba(156,163,175,.35);}
+.vtab.active[data-variant="Gold"]    {border-color:var(--gold);background:linear-gradient(135deg,rgba(251,191,36,.28),rgba(251,191,36,.08));box-shadow:0 0 20px rgba(251,191,36,.4);}
+.vtab.active[data-variant="Diamond"] {border-color:var(--diamond);background:linear-gradient(135deg,rgba(103,232,249,.28),rgba(103,232,249,.08));box-shadow:0 0 20px rgba(103,232,249,.45);}
+.vtab.active[data-variant="Rainbow"] {border-color:var(--rainbow);background:linear-gradient(135deg,rgba(168,85,247,.28),rgba(168,85,247,.08));box-shadow:0 0 22px rgba(168,85,247,.5);}
+.vtab.active[data-variant="Beskar"]  {border-color:var(--beskar);background:linear-gradient(135deg,rgba(148,163,184,.28),rgba(148,163,184,.08));box-shadow:0 0 20px rgba(148,163,184,.4);}
+.vtab.active[data-variant="Galactic"]{border-color:var(--galactic);background:linear-gradient(135deg,rgba(167,139,250,.32),rgba(167,139,250,.1));box-shadow:0 0 26px rgba(167,139,250,.6);}
+.vtab.active .vt-dot{background:currentColor;box-shadow:0 0 10px currentColor;}
+.rail-select{margin-top:6px;display:flex;flex-direction:column;gap:6px;}
+.rail-btn{padding:8px 10px;border-radius:7px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-size:0.74rem;font-weight:700;cursor:pointer;transition:all .15s;}
+.rail-btn:hover{background:var(--surface);transform:translateY(-1px);}
+.rail-btn.mark:hover{border-color:#22c55e;color:#22c55e;}
+.rail-btn.clr:hover{border-color:#ef4444;color:#ef4444;}
+
+/* Main grid area */
+.game-main{flex:1;min-width:0;}
+
+/* Detail bar */
+.detail-bar{display:flex;align-items:center;gap:14px;flex-wrap:wrap;background:linear-gradient(135deg,var(--surface2),var(--surface));border:1px solid var(--border);border-left:4px solid var(--muted);border-radius:10px;padding:12px 18px;margin-bottom:16px;min-height:60px;transition:border-color .2s;}
+.db-icon{font-size:1.6rem;line-height:1;}
+.db-left{display:flex;flex-direction:column;gap:2px;min-width:150px;}
+.db-name{font-size:1.25rem;font-weight:900;letter-spacing:1px;color:var(--text);line-height:1;}
+.db-sub{font-size:0.72rem;color:var(--muted);letter-spacing:.5px;}
+.db-tags{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-left:auto;}
+.db-tag{font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;padding:4px 11px;border-radius:999px;}
+.db-stat{font-size:0.8rem;color:var(--muted);}
+.db-stat b{color:var(--text);}
+
+/* Droid grid */
+.game-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:13px;}
+.gcell{position:relative;border-radius:11px;border:2px solid var(--border);background:linear-gradient(160deg,var(--surface),var(--bg));overflow:hidden;cursor:pointer;transition:transform .16s,border-color .16s,box-shadow .16s;display:flex;flex-direction:column;}
+.gcell:hover{transform:translateY(-4px);border-color:#5a6480;box-shadow:0 8px 22px rgba(0,0,0,.5);z-index:2;}
+.gcell-imgwrap{aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;padding:10px;position:relative;background:radial-gradient(circle at 50% 38%,rgba(255,255,255,.045),transparent 68%);}
+.gcell-imgwrap img{max-width:100%;max-height:100%;object-fit:contain;transition:filter .25s,opacity .25s,transform .16s;}
+.gcell:hover .gcell-imgwrap img{transform:scale(1.06);}
+.gcell.uncollected .gcell-imgwrap img{filter:brightness(0.09) contrast(1.15);opacity:.9;}
+.gcell-noimg{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;font-size:1.8rem;color:var(--muted);text-align:center;}
+.gcell-noimg span{font-size:0.6rem;font-weight:700;letter-spacing:.5px;}
+.gcell-name{padding:5px 6px 3px;text-align:center;font-size:0.74rem;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.gcell.uncollected .gcell-name{color:var(--muted);}
+.gcell-rarity{padding:0 5px 7px;text-align:center;font-size:0.66rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;}
+.gcell-check{position:absolute;top:7px;right:7px;width:23px;height:23px;border-radius:50%;background:#22c55e;color:#000;display:flex;align-items:center;justify-content:center;font-size:.85rem;font-weight:900;box-shadow:0 0 12px rgba(34,197,94,.8);opacity:0;transform:scale(.4);transition:all .2s;z-index:3;}
+.gcell.collected .gcell-check{opacity:1;transform:scale(1);}
+.gcell-stars{position:absolute;top:7px;left:7px;font-size:0.85rem;text-shadow:0 0 6px rgba(255,232,26,.9),0 1px 2px rgba(0,0,0,.9);pointer-events:none;z-index:3;}
+.gcell.collected{border-color:var(--cellclr,#22c55e);box-shadow:0 0 18px var(--cellglow,rgba(34,197,94,.3));}
+.gcell.collected:hover{box-shadow:0 8px 26px var(--cellglow,rgba(34,197,94,.5));}
+.gcell.na{opacity:.32;cursor:not-allowed;}
+.gcell.na:hover{transform:none;border-color:var(--border);box-shadow:none;}
+.gcell-na-tag{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);font-size:0.58rem;font-weight:800;letter-spacing:1px;color:var(--muted);background:rgba(0,0,0,.6);padding:2px 8px;border-radius:5px;}
+.grid-empty{grid-column:1/-1;text-align:center;padding:48px;color:var(--muted);font-size:1rem;}
+
+@media(max-width:640px){
+  .game-layout{flex-direction:column;}
+  .variant-rail{position:static;flex-direction:row;flex-wrap:wrap;width:100%;top:auto;}
+  .vtab{flex:1;min-width:90px;text-align:center;font-size:0.78rem;padding:9px 6px;}
+  .vtab .vt-count{font-size:0.55rem;}
+  .rail-select{flex-direction:row;width:100%;}
+  .rail-btn{flex:1;}
+}
+
 /* ── TOAST ── */
 .toast{position:fixed;bottom:22px;right:22px;z-index:999;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:11px 16px;font-size:0.84rem;box-shadow:0 8px 24px rgba(0,0,0,.5);transform:translateY(80px);opacity:0;transition:all .3s;max-width:280px;pointer-events:none;}
 .toast.show{transform:translateY(0);opacity:1;}
@@ -316,18 +386,6 @@ body::before{content:'';position:fixed;inset:0;background:
   </select>
 </div>
 
-<!-- ══ BULK SELECT ══ -->
-<div class="bulk-section">
-  <div class="bulk-label">⚡ Quick Select All:</div>
-  <button class="btn-bulk btn-bulk-base" onclick="selectAllVariant('Base')">⬜ Base</button>
-  <button class="btn-bulk btn-bulk-gold" onclick="selectAllVariant('Gold')">🟡 Gold</button>
-  <button class="btn-bulk btn-bulk-diamond" onclick="selectAllVariant('Diamond')">💎 Diamond</button>
-  <button class="btn-bulk btn-bulk-rainbow" onclick="selectAllVariant('Rainbow')">🌈 Rainbow</button>
-  <button class="btn-bulk btn-bulk-beskar" onclick="selectAllVariant('Beskar')">🔩 Beskar</button>
-  <button class="btn-bulk btn-bulk-galactic" onclick="selectAllVariant('Galactic')">🌌 Galactic</button>
-  <button class="btn-bulk btn-bulk-clear" onclick="clearAllVariant()">🗑️ Clear All</button>
-</div>
-
 <!-- ══ SCREENSHOT SCAN ══ -->
 <div class="scan-section">
   <div class="drop-zone" id="dropZone"
@@ -347,8 +405,34 @@ body::before{content:'';position:fixed;inset:0;background:
   </div>
 </div>
 
-<!-- ══ MAIN ══ -->
-<div class="main" id="main"></div>
+<!-- ══ MAIN (game-style) ══ -->
+<div class="game-layout">
+  <aside class="variant-rail" id="variantRail">
+    <div class="rail-title">Variant Tier</div>
+    <div class="vtab active" data-variant="Base"     onclick="setVariant('Base')">Default<span class="vt-dot"></span><span class="vt-count" id="vt-Base">0 / 0</span></div>
+    <div class="vtab" data-variant="Gold"     onclick="setVariant('Gold')">Gold<span class="vt-dot"></span><span class="vt-count" id="vt-Gold">0 / 0</span></div>
+    <div class="vtab" data-variant="Diamond"  onclick="setVariant('Diamond')">Diamond<span class="vt-dot"></span><span class="vt-count" id="vt-Diamond">0 / 0</span></div>
+    <div class="vtab" data-variant="Rainbow"  onclick="setVariant('Rainbow')">Rainbow<span class="vt-dot"></span><span class="vt-count" id="vt-Rainbow">0 / 0</span></div>
+    <div class="vtab" data-variant="Beskar"   onclick="setVariant('Beskar')">Beskar<span class="vt-dot"></span><span class="vt-count" id="vt-Beskar">0 / 0</span></div>
+    <div class="vtab" data-variant="Galactic" onclick="setVariant('Galactic')">Galactic<span class="vt-dot"></span><span class="vt-count" id="vt-Galactic">0 / 0</span></div>
+    <div class="rail-select">
+      <button class="rail-btn mark" onclick="selectActiveVariant()">✓ Mark all shown</button>
+      <button class="rail-btn clr" onclick="clearActiveVariant()">✕ Clear all shown</button>
+    </div>
+  </aside>
+
+  <div class="game-main">
+    <div class="detail-bar" id="detailBar">
+      <span class="db-icon" id="dbIcon">🤖</span>
+      <div class="db-left">
+        <div class="db-name" id="dbName">Hover a droid</div>
+        <div class="db-sub" id="dbSub">Pick a variant tier on the left, then click droids you own</div>
+      </div>
+      <div class="db-tags" id="dbTags"></div>
+    </div>
+    <div class="game-grid" id="gameGrid"></div>
+  </div>
+</div>
 
 <script>
 // ────────────────────────────────────────────────────────
@@ -436,6 +520,13 @@ const VARIANTS  = ["Base","Gold","Diamond","Rainbow","Beskar","Galactic"];
 const V_ICONS   = {Base:"⬜",Gold:"🟡",Diamond:"💎",Rainbow:"🌈",Beskar:"🔩",Galactic:"🌌"};
 const R_ORDER   = ["Common","Rare","Epic","Legendary","Mythic","Iconic"];
 const R_COLORS  = {Common:"#9ca3af",Rare:"#3b82f6",Epic:"#a855f7",Legendary:"#f59e0b",Mythic:"#ec4899",Iconic:"#e84545"};
+
+// ── Game-view config ──
+let activeVariant = "Base";
+const V_LABELS  = {Base:"Default",Gold:"Gold",Diamond:"Diamond",Rainbow:"Rainbow",Beskar:"Beskar",Galactic:"Galactic"};
+const V_COLORS  = {Base:"#9ca3af",Gold:"#fbbf24",Diamond:"#67e8f9",Rainbow:"#a855f7",Beskar:"#94a3b8",Galactic:"#a78bfa"};
+const V_GLOW    = {Base:"rgba(156,163,175,.4)",Gold:"rgba(251,191,36,.5)",Diamond:"rgba(103,232,249,.55)",Rainbow:"rgba(168,85,247,.55)",Beskar:"rgba(148,163,184,.5)",Galactic:"rgba(167,139,250,.65)"};
+const TYPE_ICONS= {Worker:"🔧",Astromech:"🛰️",Battle:"⚔️"};
 
 // ── IMAGES ──
 const IMG_BASE = "https://raw.githubusercontent.com/erikpeik/droidex/main/public/droids/";
@@ -543,63 +634,68 @@ function clearAllVariant(){
 // ────────────────────────────────────────────────────────
 //  TOGGLE
 // ────────────────────────────────────────────────────────
-function toggle(name, v){
-  const key=name+"_"+v;
+// Iconic droids can only be owned in Base; other variants are N/A for them
+function variantAvailable(d,v){ return !(d.rarity==="Iconic" && v!=="Base"); }
+
+// Image URL for a specific variant of a droid
+function getVariantImgUrl(d,v){
+  const key=getDroidImgKey(d.name);
+  return IMG_BASE+key+"_"+V_IMGKEY[v]+".png";
+}
+
+// ── Toggle collected for the active variant ──
+function toggleActive(name){
+  const d=DROIDS.find(x=>x.name===name);
+  if(!d || !variantAvailable(d,activeVariant)) return;
+  const key=name+"_"+activeVariant;
   col[key]=!col[key];
   if(!col[key]) delete col[key];
   save();
-  refreshCard(name);
+  renderGrid();
   updateStats();
 }
 
-function toggleRarity(rarity){
-  collapsed[rarity]=!collapsed[rarity];
-  save();
-  const block=document.querySelector(`[data-rarity="${rarity}"]`);
-  if(!block) return;
-  const arrow=block.querySelector(".rarity-arrow");
-  const grid=block.querySelector(".droids-grid");
-  if(collapsed[rarity]){
-    arrow.classList.add("collapsed");
-    grid.style.display="none";
-  } else {
-    arrow.classList.remove("collapsed");
-    grid.style.display="grid";
-  }
+// ── Switch variant tier ──
+function setVariant(v){
+  activeVariant=v;
+  document.querySelectorAll(".vtab").forEach(t=>t.classList.toggle("active",t.dataset.variant===v));
+  renderGrid();
 }
 
-function refreshCard(name){
-  const card=document.querySelector(`[data-droid="${CSS.escape(name)}"]`);
-  if(!card) return;
+// ── Mark / clear all shown droids for the active variant ──
+function selectActiveVariant(){
+  const list=filtered().filter(d=>variantAvailable(d,activeVariant));
+  let added=0;
+  list.forEach(d=>{ const k=d.name+"_"+activeVariant; if(!col[k]){col[k]=true;added++;} });
+  save(); renderGrid(); updateStats();
+  toast(`✅ Marked ${added} droids as ${V_LABELS[activeVariant]}!`,"success");
+}
+function clearActiveVariant(){
+  const list=filtered().filter(d=>variantAvailable(d,activeVariant));
+  let removed=0;
+  list.forEach(d=>{ const k=d.name+"_"+activeVariant; if(col[k]){delete col[k];removed++;} });
+  save(); renderGrid(); updateStats();
+  toast(`🗑️ Cleared ${removed} ${V_LABELS[activeVariant]} droids.`,"info");
+}
+
+// ── Detail bar on hover ──
+function setDetail(name){
   const d=DROIDS.find(x=>x.name===name);
   if(!d) return;
-  
-  const availableVariants = d.rarity==="Iconic" ? ["Base"] : VARIANTS;
-  const n=availableVariants.filter(v=>col[name+"_"+v]).length;
-  
-  // update each vbtn
-  availableVariants.forEach(v=>{
-    const btn=card.querySelector(`[data-v="${v}"]`);
-    if(!btn) return;
-    const on=!!col[name+"_"+v];
-    btn.className="vbtn"+(on?" c-"+v:"");
-    btn.querySelector(".v-dot").textContent=on?"✓":"";
-  });
-  // update image
-  const img=card.querySelector(".droid-card-img");
-  if(img){
-    const {url,collected}=getDroidImgUrl(d);
-    img.src=url;
-    img.className="droid-card-img "+(collected?"":"uncollected");
-  }
-  // badge
-  const badge=card.querySelector(".complete-badge");
-  if(badge){
-    if(n===availableVariants.length){badge.textContent="✨ Complete!";badge.className="complete-badge done";}
-    else if(n>0){badge.textContent=n+"/"+availableVariants.length;badge.className="complete-badge partial";}
-    else{badge.textContent="";badge.className="complete-badge";}
-  }
-  card.classList.toggle("all-done", n===availableVariants.length);
+  const owned=!!col[d.name+"_"+activeVariant];
+  const na=!variantAvailable(d,activeVariant);
+  document.getElementById("dbIcon").textContent=d.companion?"🎵":(TYPE_ICONS[d.type]||"🤖");
+  document.getElementById("dbName").textContent=d.name;
+  let sub=d.companion?"Companion · +15% income bonus":(d.perk?("⚡ "+d.perk):(d.income+" · Cost "+d.cost));
+  document.getElementById("dbSub").textContent=sub;
+  const bar=document.getElementById("detailBar");
+  bar.style.borderLeftColor=R_COLORS[d.rarity];
+  const rc=R_COLORS[d.rarity], vc=V_COLORS[activeVariant];
+  document.getElementById("dbTags").innerHTML=
+    `<span class="db-tag" style="background:${rc}22;color:${rc}">${d.rarity}</span>`
+   +`<span class="db-tag" style="background:${vc}22;color:${vc}">${V_LABELS[activeVariant]}</span>`
+   +(na?`<span class="db-stat">— no variant for Iconic —</span>`
+        :`<span class="db-stat">${owned?"<b style='color:#22c55e'>✓ Owned</b>":"Not owned"}</span>`);
 }
 
 // ────────────────────────────────────────────────────────
@@ -662,92 +758,60 @@ function filtered(){
   });
 }
 
-function cardHTML(d){
-  // Iconic droids only have Base variant
-  const availableVariants = d.rarity==="Iconic" ? ["Base"] : VARIANTS;
-  const n=availableVariants.filter(v=>col[d.name+"_"+v]).length;
-  const done=n===availableVariants.length;
-  const typeClass="t-"+d.type;
-  let badge="";
-  if(done) badge=`<span class="complete-badge done">✨ Complete!</span>`;
-  else if(n>0) badge=`<span class="complete-badge partial">${n}/${availableVariants.length}</span>`;
-
-  const varBtns=availableVariants.map(v=>{
-    const on=!!col[d.name+"_"+v];
-    const iconClass=v==="Rainbow"?"vi-Rainbow":v==="Galactic"?"vi-Galactic":"";
-    const safeName=d.name.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
-    return `<div class="vbtn${on?" c-"+v:""}" data-v="${v}" onclick="toggle('${safeName}','${v}')" title="${d.name} — ${v}">
-      <span class="v-icon ${iconClass}">${V_ICONS[v]}</span>
-      <span class="v-lbl">${v}</span>
-      <div class="v-dot">${on?"✓":""}</div>
-    </div>`;
-  }).join("");
-
-  const statLine=d.companion
-    ? `<span class="companion-badge">Companion</span>`
-    : `<span class="type-badge ${typeClass}">${d.type}</span><span class="droid-stat">${d.income} · Cost: ${d.cost}</span>`;
-
-  const {url:imgUrl, collected:imgCollected}=getDroidImgUrl(d);
-  const imgClass=imgCollected?"":"uncollected";
-
-  return `<div class="card${done?" all-done":""}" data-droid="${d.name}">
-    <div class="card-inner">
-      <div class="card-img-wrap">
-        <img class="droid-card-img ${imgClass}" src="${imgUrl}" alt="${d.name}" onerror="this.parentElement.style.display='none'" />
-      </div>
-      <div class="card-body">
-        <div class="card-top">
-          <div>
-            <div class="droid-name">${d.name}</div>
-            <div class="droid-meta">${statLine}</div>
-          </div>
-          ${badge}
-        </div>
-      </div>
+// ── One droid cell for the current active variant ──
+function gcellHTML(d){
+  const safeName=d.name.replace(/\\/g,"\\\\").replace(/'/g,"\\'");
+  const na=!variantAvailable(d,activeVariant);
+  const owned=!!col[d.name+"_"+activeVariant];
+  const rc=R_COLORS[d.rarity];
+  const imgUrl=na?getVariantImgUrl(d,"Base"):getVariantImgUrl(d,activeVariant);
+  const stateClass=na?"na":(owned?"collected":"uncollected");
+  const styleVars=owned?`--cellclr:${V_COLORS[activeVariant]};--cellglow:${V_GLOW[activeVariant]};`:"";
+  const stars = d.rarity==="Iconic" ? "⭐" : (d.rarity==="Mythic" ? "✦" : "");
+  return `<div class="gcell ${stateClass}" style="${styleVars}"
+      onmouseenter="setDetail('${safeName}')" onclick="toggleActive('${safeName}')" title="${d.name} — ${d.rarity}">
+    ${stars?`<span class="gcell-stars">${stars}</span>`:""}
+    <div class="gcell-check">✓</div>
+    <div class="gcell-imgwrap">
+      <img src="${imgUrl}" alt="${d.name}" onerror="imgFail(this,'${safeName}')" />
     </div>
-    <div class="variants">${varBtns}</div>
-    ${d.companion?`<div class="companion-note">🎵 Companion droid — gives +15% income bonus to its type when placed</div>`:""}
-    ${d.perk?`<div class="perk-note">⚡ Equip perk: ${d.perk}</div>`:""}
+    <div class="gcell-name">${d.name}</div>
+    <div class="gcell-rarity" style="color:${rc}">${d.rarity}</div>
+    ${na?`<span class="gcell-na-tag">No variant</span>`:""}
   </div>`;
 }
 
-function render(){
-  const main=document.getElementById("main");
+// Fallback when an image is missing
+function imgFail(img,name){
+  const wrap=img.parentElement;
+  wrap.innerHTML=`<div class="gcell-noimg">🤖<span>${name}</span></div>`;
+}
+
+// ── Render the grid for the active variant ──
+function render(){ renderGrid(); }
+function renderGrid(){
+  const grid=document.getElementById("gameGrid");
+  if(!grid) return;
   const list=filtered();
   if(!list.length){
-    main.innerHTML='<div class="empty">🤖 No droids match your filters.</div>';
-    return;
+    grid.innerHTML='<div class="grid-empty">🤖 No droids match your filters.</div>';
+  } else {
+    // keep rarity order
+    const ordered=[];
+    R_ORDER.forEach(r=>list.filter(d=>d.rarity===r).forEach(d=>ordered.push(d)));
+    grid.innerHTML=ordered.map(gcellHTML).join("");
   }
-  let html="";
-  R_ORDER.forEach(r=>{
-    const ds=DROIDS.filter(d=>d.rarity===r);
-    const vis=list.filter(d=>d.rarity===r);
-    if(!vis.length) return;
-    const rt=ds.reduce((sum,d)=>{
-      return sum + (d.rarity==="Iconic" ? 1 : VARIANTS.length);
-    },0);
-    const rc=ds.reduce((a,d)=>{
-      const av = d.rarity==="Iconic" ? ["Base"] : VARIANTS;
-      return a + av.filter(v=>col[d.name+"_"+v]).length;
-    },0);
-    const pct=rt>0?Math.round(rc/rt*100):0;
-    const col_=R_COLORS[r];
-    const isCollapsed=collapsed[r];
-    const arrowClass=isCollapsed?"rarity-arrow collapsed":"rarity-arrow";
-    const gridStyle=isCollapsed?'style="display:none"':'';
-    html+=`<div class="rarity-block rarity-${r}" data-rarity="${r}">
-      <div class="rarity-hdr" onclick="toggleRarity('${r}')">
-        <span class="${arrowClass}">▼</span>
-        <span class="rarity-badge">${r}</span>
-        <div class="rarity-prog">
-          <div class="rp-bar"><div class="rp-fill" id="rfill-${r}" style="background:${col_};width:${pct}%"></div></div>
-        </div>
-        <span id="rprog-${r}" class="rarity-count">${rc}/${rt}</span>
-      </div>
-      <div class="droids-grid" ${gridStyle}>${vis.map(cardHTML).join("")}</div>
-    </div>`;
+  updateRailCounts();
+}
+
+// ── Update per-variant counts on the rail ──
+function updateRailCounts(){
+  VARIANTS.forEach(v=>{
+    const applicable=DROIDS.filter(d=>variantAvailable(d,v));
+    const owned=applicable.filter(d=>col[d.name+"_"+v]).length;
+    const el=document.getElementById("vt-"+v);
+    if(el) el.textContent=owned+" / "+applicable.length;
   });
-  main.innerHTML=html;
 }
 
 // ────────────────────────────────────────────────────────
